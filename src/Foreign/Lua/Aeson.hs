@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE CPP #-}
+
 {-|
 Module      :  Foreign.Lua.Aeson
 Copyright   :  © 2017–2020 Albert Krewinkel
@@ -128,7 +130,11 @@ isNull idx = do
 -- | Push a vector unto the stack.
 pushvector :: Pushable a => Vector a -> Lua ()
 pushvector v = do
+#if MIN_VERSION_hslua(1,1,1)
+  pushList push $ toList v
+#else
   pushList . toList $ v
+#endif
   push (fromIntegral (Vector.length v) :: Lua.Integer)
   rawseti (-2) 0
 
